@@ -25,8 +25,9 @@ class txStatHat(object):
     def __init__(self, ezkey):
         """Initialize a txStatHat instance.
 
-        *ezkey* is you API key, i.e. your e-mail address by default. Does no
-        network activity.
+        Does no network activity.
+
+        :param ezkey: your API key, i.e. your e-mail address by default.
 
         """
 
