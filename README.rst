@@ -21,7 +21,7 @@ The usage is as simple as::
     reactor.callLater(1, doSomeStats)
     reactor.run()
 
-Depending on the availability of pyOpenSSL_, txStatHat uses https for API
+Depending on the availability of pyOpenSSL_, txStatHat uses HTTPS for API
 calls if possible.
 
 .. _Twisted: http://twistedmatrix.com/
