@@ -12,7 +12,7 @@ The usage is as simple as::
 
     @inlineCallbacks
     def doSomeStats():
-        sh = txStatHat('keyOrEmail')
+        sh = txStatHat('keyOrEmail', ignore_errors=True)
         yield sh.count('aCounter')  # Counts by 1 by default
         yield sh.count('anotherCounter', 42)
         yield sh.value('aValue', 0.42)
@@ -20,6 +20,10 @@ The usage is as simple as::
 
     reactor.callLater(1, doSomeStats)
     reactor.run()
+
+By default, errors are swallowed silently so disruptions at StatHat don’t lead
+to disruption in your services by accident. To get network exceptions as well
+as API error messages, set ``ignore_errors=False`` when instantiating txStatHat.
 
 Depending on the availability of pyOpenSSL_, txStatHat uses HTTPS for API
 calls if possible.
