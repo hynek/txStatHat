@@ -3,7 +3,7 @@
 History
 -------
 
-0.2.0 (2012-04-??)
+0.2.0 (2012-04-05)
 ++++++++++++++++++
 
 * txStatHat now ignores errors by default in order to minimize disruption and

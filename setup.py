@@ -9,7 +9,7 @@ except ImportError:
 
 setup(
     name="txStatHat",
-    version='0.1',
+    version='0.2.0',
     description="Twisted wrapper for StatHat.com",
     long_description=open('README.rst').read(),
     classifiers=[
