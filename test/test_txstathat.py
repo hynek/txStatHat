@@ -8,6 +8,7 @@ from decimal import Decimal
 
 import os
 
+from twisted.internet import defer
 from twisted.trial import unittest
 from twisted.web.client import getPage
 
@@ -34,20 +35,27 @@ if EZ_KEY:
         TEST_VALUE = b'txSHTestValue'
         TEST_CALL = b'txSHTestCall'
 
+        MSG_OK = b'{"status":200,"msg":"ok"}'
+        MSG_NO_EZKEY = b'{"status":500,"msg":"no ezkey specified"}'
+
         def setUp(self):
             self.sh = txstathat.txStatHat(EZ_KEY)
+            # some tests tinker with the API URI
+            self.old_API_URI = txstathat.API_URI
+
+        def tearDown(self):
+            txstathat.API_URI = self.old_API_URI
 
         def _add_ok_check(self, deferred):
             """Add callback that checks whether the API returned a success."""
             deferred.addCallback(
-                lambda s: self.assertEqual(s, b'{"status":200,"msg":"ok"}')
+                lambda s: self.assertEqual(s, self.MSG_OK)
             )
             return deferred
 
         def test__whether_stathat_is_reachable(self):
             d = getPage(txstathat.API_URI)
-            d.addCallback(lambda s: self.assertEqual(
-                s, b'{"status":500,"msg":"no ezkey specified"}'))
+            d.addCallback(lambda s: self.assertEqual(s, self.MSG_NO_EZKEY))
             return d
 
         def test_ssl_detection(self):
@@ -73,3 +81,18 @@ if EZ_KEY:
         def test_value_decimal(self):
             d = self.sh.value(self.TEST_VALUE, Decimal('0.42'))
             return self._add_ok_check(d)
+
+        def test_ignore_errors_really_ignores(self):
+            d1 = txstathat.txStatHat(b'').count(self.TEST_COUNT, 42)
+            d1.addCallback(lambda s: self.assertEqual(s, self.MSG_NO_EZKEY))
+
+            txstathat.API_URI = b'http://invalid.invalid'
+            d2 = self.sh.count(b'does not matter')
+            d2.addCallback(lambda rv: self.assertIsNone(rv))
+
+            return defer.DeferredList([d1, d2])
+
+        def test_check_api_result(self):
+            d = txstathat.txStatHat(b'', ignore_errors=False) \
+                    .count(self.TEST_COUNT, 42)
+            return self.assertFailure(d, txstathat.txStatHatApiException)
